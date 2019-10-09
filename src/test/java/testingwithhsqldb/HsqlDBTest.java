@@ -51,17 +51,31 @@ public class HsqlDBTest {
 	}
 
 	@Test
-	public void findExistingCustomer() throws SQLException {
-		String name = myObject.nameOfCustomer(0);
+	public void findExistingProduct() throws SQLException {
+		String name = myObject.nameOfProduct(0);
 		assertNotNull("Customer exists, name should not be null", name);
 		assertEquals("Bad name found !", "Steel", name);
 	}
 
 	@Test
-	public void nonExistingCustomerReturnsNull() throws SQLException {
-		String name = myObject.nameOfCustomer(-1);
+	public void nonExistingProductReturnsNull() throws SQLException {
+		String name = myObject.nameOfProduct(-1);
 		assertNull("name should be null, customer does not exist !", name);
 	}
+        
+        @Test
+	public void testFindProduct() throws DAOException {
+		int productID = 1;
+		Product product = myObject.findProduct(productID);
+		assertEquals("Chair Shoe", product.getName());
+	}
+        
+        /*@Test
+        public void  existingProduct() throws SQLException{
+            String name = myObject.nameOfProduct(0);
+            assertNull("Product exists , name should not be null");
+            
+        }*/
 
 	public static DataSource getDataSource() {
 		org.hsqldb.jdbc.JDBCDataSource ds = new org.hsqldb.jdbc.JDBCDataSource();

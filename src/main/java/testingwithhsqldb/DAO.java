@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 public class DAO {
@@ -19,7 +21,7 @@ public class DAO {
 	 * @return le nom du client (LastName) ou null si pas trouvé
 	 * @throws SQLException 
 	 */
-	public String nameOfCustomer(int id) throws SQLException {
+	public String nameOfProduct(int id) throws SQLException {
 		String result = null;
 		
 		String sql = "SELECT LastName FROM Customer WHERE ID = ?";
@@ -38,5 +40,44 @@ public class DAO {
 		// dernière ligne : on renvoie le résultat
 		return result;
 	}
+        
+        public void newProduct(Product product) throws DAOException{
+            
+            String name = "INSERT INTO Product VALUES (?,?,?)";
+                try (Connection connection = myDataSource.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(name)){             
+                    stmt.setInt(1, product.getProductId());
+                    ResultSet rs = stmt.executeQuery();
+                    stmt.setString(2, product.getName());
+                    stmt.setFloat(3, product.getPrice());
+                    stmt.executeQuery();
+                    
+                } catch (SQLException ex) {
+			Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+			throw new DAOException(ex.getMessage());
+		}
+        }
+        
+        public Product findProduct(int productID) throws DAOException{
+            String sql = "SELECT Name,Price FROM PRODUCT WHERE ID = ?";
+		try (Connection connection = myDataSource.getConnection(); // On crée un statement pour exécuter une requête
+			PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+			stmt.setInt(1, productID);
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) { // On a trouvé
+					String name = rs.getString("NAME");
+					float price = rs.getFloat("Price");
+					// On crée l'objet "entity"
+					Product result = new Product(productID, name, price);
+                                        return result;
+				} // else on n'a pas trouvé, on renverra null
+                                return null;
+			}
+		}  catch (SQLException ex) {
+			Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+			throw new DAOException(ex.getMessage());
+		}
+        }
 	
 }
